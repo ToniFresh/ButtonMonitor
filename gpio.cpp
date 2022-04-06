@@ -41,6 +41,7 @@ void gpio::set(unsigned int pattern)
     }
 }
 
+
 // Read pin state
 bool gpio::get(int pin)
 {

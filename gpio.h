@@ -19,6 +19,7 @@ public slots:
 
 private:
     int m_handle;
+    QList<bool> m_oldstates;
 };
 
 #endif // GPIO_H

@@ -14,6 +14,6 @@ const int LFLAGS = 0;
 const int CHIP = 0;
 
 // Update interval for reading pin state
-const int T_UPDATE = 200; //  ms
+const int T_UPDATE = 50; //  ms
 
 #endif // CONFIG_H

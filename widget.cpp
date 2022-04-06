@@ -13,7 +13,11 @@ Widget::Widget(QWidget *parent)
     setLayout(grid);
 
     // Labels for input pins / buttons
+    m_countnum = 0;
     int column = 0;
+    m_oldstates = {0, 0, 0};
+    m_states = {0, 0, 0};
+
     for (auto pin : BUTTONS) {
         // pin numbers
         QLabel* label = new QLabel("GPIO " + QString::number(pin), this);
@@ -27,18 +31,57 @@ Widget::Widget(QWidget *parent)
         m_input_display.push_back(state);
     }
 
+    counterlabel->setAlignment(Qt::AlignCenter);
+    grid->addWidget(counterlabel, 2, 1);
+
     // initialize hardware
     m_gpio = new gpio();
 
     m_timer = new QTimer(this);
     // Connect QTimer (Signal) with GUI function (Slot) "update display"
     connect(m_timer, &QTimer::timeout, this, &Widget::updateButtonState);
+    connect(m_timer, &QTimer::timeout, this, &Widget::getFlank);
     m_timer->start(T_UPDATE);
+
+    counterlabel->setText("Counter: " + QString::number(m_countnum));
 }
 
 Widget::~Widget()
 {
 
+}
+
+void Widget::getFlank()
+{
+    short cnt = 0;
+    for (auto pin : BUTTONS){
+    m_states[cnt] = !m_gpio->get(pin);
+    cnt++;
+    }
+
+    cnt = 0;
+    for (auto pin : BUTTONS){
+        qDebug() << "Countnum: " << m_countnum;
+
+        qDebug() << "Pin: " << pin;
+        qDebug() << "NewState: " << m_states[cnt];
+        qDebug() << "OldState: " << m_oldstates[cnt];
+        if(m_oldstates[cnt] !=  m_states[cnt]) updateCountState(pin);
+
+        cnt++;
+    }
+
+}
+
+void Widget::updateCountState(short pin)
+{
+  if(pin == 22)  m_countnum++;
+  if(pin == 17)  m_countnum--;
+  if(pin == 27)  m_countnum = 0;
+
+  counterlabel->setText("Counter: " + QString::number(m_countnum / 2));
+
+  for(short cnt = 0; cnt < 3; cnt++) m_oldstates[cnt] = m_states[cnt];
 }
 
 void Widget::updateButtonState()
