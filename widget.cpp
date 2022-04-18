@@ -6,7 +6,7 @@
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
-    // Widget s &QTimer::timeouttructure
+    // Widget s &QTimer::timeoutstructure
     setWindowTitle("ButtonMonitor");
     resize(300, 100);
     QGridLayout* grid = new QGridLayout(this);
@@ -28,7 +28,7 @@ Widget::Widget(QWidget *parent)
         QLabel* state = new QLabel("0", this);
         state->setAlignment(Qt::AlignCenter);
         grid->addWidget(state, 1, column++); // links oben (2. Zeile / 1. - 3. Spalte)
-        m_input_display.push_back(state);
+        m_input_display.append(state);
     }
 
     counterlabel->setAlignment(Qt::AlignCenter);
@@ -54,10 +54,7 @@ Widget::~Widget()
 void Widget::getFlank()
 {
     short cnt = 0;
-    for (auto pin : BUTTONS){
-    m_states[cnt] = !m_gpio->get(pin);
-    cnt++;
-    }
+    for (auto pin : BUTTONS) m_states[cnt++] = !m_gpio->get(pin);
 
     cnt = 0;
     for (auto pin : BUTTONS){
@@ -66,18 +63,16 @@ void Widget::getFlank()
         qDebug() << "Pin: " << pin;
         qDebug() << "NewState: " << m_states[cnt];
         qDebug() << "OldState: " << m_oldstates[cnt];
-        if(m_oldstates[cnt] !=  m_states[cnt]) updateCountState(pin);
-
-        cnt++;
+        if(m_oldstates[cnt] !=  m_states[cnt++]) updateCountState(pin);
     }
 
 }
 
 void Widget::updateCountState(short pin)
 {
-  if(pin == 22)  m_countnum++;
-  if(pin == 17)  m_countnum--;
-  if(pin == 27)  m_countnum = 0;
+  if(pin == BUTTONS[0])  m_countnum++;
+  if(pin == BUTTONS[1])  m_countnum = 0;
+  if(pin == BUTTONS[2])  m_countnum--;
 
   counterlabel->setText("Counter: " + QString::number(m_countnum / 2));
 
